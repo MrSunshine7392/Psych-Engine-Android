@@ -1,6 +1,6 @@
 package;
 
-#if desktop
+#if windows 
 import Sys.sleep;
 import discord_rpc.DiscordRpc;
 
@@ -13,16 +13,17 @@ using StringTools;
 
 class DiscordClient
 {
+	public static var isInitialized:Bool = false;
 	public function new()
 	{
-		//trace("Discord Client starting...");
+		trace("Discord Client starting...");
 		DiscordRpc.start({
-			clientID: "863222024192262205",
+			clientID: "840025802841653248",
 			onReady: onReady,
 			onError: onError,
 			onDisconnected: onDisconnected
 		});
-		//trace("Discord Client started.");
+		trace("Discord Client started.");
 
 		while (true)
 		{
@@ -42,21 +43,21 @@ class DiscordClient
 	static function onReady()
 	{
 		DiscordRpc.presence({
-			details: "In the Menus",
+			details: "📱 | In the Menus",
 			state: null,
-			largeImageKey: 'icon',
-			largeImageText: "Psych Engine"
+			largeImageKey: 'https://i.imgur.com/j1NOFU9.gif',
+			largeImageText: "Pibby: Apocalypse"
 		});
 	}
 
 	static function onError(_code:Int, _message:String)
 	{
-		//trace('Error! $_code : $_message');
+		trace('Error! $_code : $_message');
 	}
 
 	static function onDisconnected(_code:Int, _message:String)
 	{
-		//trace('Disconnected! $_code : $_message');
+		trace('Disconnected! $_code : $_message');
 	}
 
 	public static function initialize()
@@ -65,10 +66,11 @@ class DiscordClient
 		{
 			new DiscordClient();
 		});
-		//trace("Discord Client initialized");
+		trace("Discord Client initialized");
+		isInitialized = true;
 	}
 
-	public static function changePresence(details:String, state:Null<String>, ?smallImageKey : String, ?hasStartTimestamp : Bool, ?endTimestamp: Float)
+	public static function changePresence(details:String, state:Null<String>, ?smallImageKey : String, ?hasStartTimestamp : Bool, ?endTimestamp: Float, ?largeImageKey: String = "https://i.imgur.com/j1NOFU9.gif")
 	{
 		var startTimestamp:Float = if(hasStartTimestamp) Date.now().getTime() else 0;
 
@@ -80,7 +82,7 @@ class DiscordClient
 		DiscordRpc.presence({
 			details: details,
 			state: state,
-			largeImageKey: 'icon',
+			largeImageKey: largeImageKey,
 			largeImageText: "Engine Version: " + MainMenuState.psychEngineVersion,
 			smallImageKey : smallImageKey,
 			// Obtained times are in milliseconds so they are divided so Discord can use it

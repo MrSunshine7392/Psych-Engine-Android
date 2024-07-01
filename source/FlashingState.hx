@@ -13,50 +13,43 @@ import flixel.util.FlxTimer;
 
 class FlashingState extends MusicBeatState
 {
-	public static var leftState:Bool = false;
+    var leftState:Bool = false;
 
 	var warnText:FlxText;
 	override function create()
 	{
-		super.create();
+    	super.create();
 
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		add(bg);
 
-		warnText = new FlxText(0, 0, FlxG.width,
-			"Hey, watch out!\n
-			This Mod contains some flashing lights!\n
-			To disable them now go to Options Menu.\n
-			Touch the screen to enter the game.\n
-			You've been warned!",
+		warnText = new FlxText(0, 0, 800,
+			"You want to enable shaders?, this can negatively affect performance\nPress A to enable Shaders\nWait 5 seconds to choose",
 			32);
 		warnText.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, CENTER);
-		warnText.screenCenter(Y);
+		warnText.screenCenter(XY);
 		add(warnText);
+
+		new FlxTimer().start(5, function(tmr:FlxTimer)
+		{
+		#if mobile
+        addVirtualPad(NONE, A_B);
+        #end
+	    });
 	}
 
 	override function update(elapsed:Float)
 	{
-	    #if mobile
-		var justTouched:Bool = false;
-
-		for (touch in FlxG.touches.list)
-		{
-			justTouched = false;
-			
-			if (touch.justReleased){
-				justTouched = true;
-			}
-		}
-		#end
 		if(!leftState) {
 			var back:Bool = controls.BACK;
-			if (controls.ACCEPT || back #if mobile || justTouched #end) {
+			if (controls.ACCEPT || back) {
 				leftState = true;
 				FlxTransitionableState.skipNextTransIn = true;
 				FlxTransitionableState.skipNextTransOut = true;
+				ClientPrefs.skipflashingstate = true;
+				ClientPrefs.saveSettings();
 				if(!back) {
-					ClientPrefs.flashing = false;
+					ClientPrefs.shaders = true;
 					ClientPrefs.saveSettings();
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 					FlxFlicker.flicker(warnText, 1, 0.1, false, true, function(flk:FlxFlicker) {
